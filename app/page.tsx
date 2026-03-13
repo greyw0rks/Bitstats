@@ -1,6 +1,7 @@
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Link from "next/link";
+import { IndexHeroCard, IndexIssuance, IndexVerification } from "./components/Illustrations";
 
 export const metadata = { title: "BitStats — Bitcoin Identity Layer" };
 
@@ -11,14 +12,16 @@ const features = [
 ];
 
 const steps = [
-  { num: "01", label: "Foundation", color: "var(--blue)", title: "Register your BNS name", body: "Your BNS name becomes your identity root. Register once, own it forever on Stacks. No company can revoke it." },
-  { num: "02", label: "Issuance", color: "var(--green)", title: "Receive credentials onchain", body: "Trusted issuers publish credential hashes to the blockchain, tied to your BNS name. Immutable and permanent." },
-  { num: "03", label: "Privacy", color: "#C47A00", title: "Prove without revealing", body: "Generate a ZK proof in-browser. The dapp gets a boolean — your data never leaves your device." },
+  { num:"01", label:"Foundation", color:"var(--blue)",  title:"Register your BNS name",         body:"Your BNS name becomes your identity root. Register once, own it forever on Stacks. No company can revoke it.",                    Visual: IndexHeroCard },
+  { num:"02", label:"Issuance",   color:"var(--green)", title:"Receive credentials onchain",     body:"Trusted issuers publish credential hashes to the blockchain, tied to your BNS name. Immutable and permanent.",                  Visual: IndexIssuance },
+  { num:"03", label:"Privacy",    color:"#C47A00",      title:"Prove without revealing",          body:"Generate a ZK proof in-browser. The dapp gets a boolean — your data never leaves your device.",                                Visual: IndexVerification },
 ];
+
+const stepBgs = ["#F0F5FF", "#F0FBF8", "#FFFBF5"];
 
 const stats = [
   { num: "50K+", label: "Credentials issued" },
-  { num: "2s", label: "Proof generation" },
+  { num: "2s",   label: "Proof generation" },
   { num: "100%", label: "Private by default" },
 ];
 
@@ -33,6 +36,7 @@ export default function Home() {
     <>
       <Navbar />
       <main style={{ paddingTop: 68 }}>
+
         {/* HERO */}
         <section style={{ padding: "96px 5% 80px", background: "linear-gradient(160deg, var(--blue-light) 0%, white 60%)" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }} className="hero-inner">
@@ -60,24 +64,10 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            {/* Hero visual */}
             <div style={{ display: "flex", justifyContent: "center", padding: "32px 0" }}>
-              <div style={{ position: "relative" }}>
-                <div style={{ background: "white", borderRadius: 20, padding: 28, boxShadow: "0 8px 40px rgba(10,100,255,0.12)", border: "1px solid var(--border)", minWidth: 300 }}>
-                  <div style={{ fontSize: 11, color: "var(--text-4)", marginBottom: 4 }}>Identity root</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "monospace" }}>satoshi.btc</div>
-                  <div style={{ fontSize: 12, color: "var(--green)", marginBottom: 20 }}>Verified · Anchored to Bitcoin</div>
-                  {[
-                    { icon: "🪪", label: "KYC Verification", color: "var(--blue)", bg: "var(--blue-light)" },
-                    { icon: "📈", label: "Accredited Investor", color: "var(--green)", bg: "var(--green-light)" },
-                    { icon: "🎓", label: "Pro Certification", color: "#C47A00", bg: "var(--amber-light)" },
-                  ].map(c => (
-                    <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: c.bg, borderRadius: 10, marginBottom: 8 }}>
-                      <span>{c.icon}</span>
-                      <span style={{ fontSize: 13, fontWeight: 600, flex: 1 }}>{c.label}</span>
-                      <span style={{ color: c.color, fontWeight: 700 }}>✓</span>
-                    </div>
-                  ))}
+              <div style={{ position: "relative", width: "100%", maxWidth: 380 }}>
+                <div style={{ background: "#F0F5FF", borderRadius: 16, aspectRatio: "4/3", overflow: "hidden", boxShadow: "0 8px 40px rgba(10,100,255,0.12)", border: "1px solid var(--border)" }}>
+                  <IndexHeroCard />
                 </div>
                 <div style={{ position: "absolute", top: -18, right: -18, background: "white", borderRadius: 12, padding: "8px 14px", boxShadow: "var(--shadow)", border: "1px solid var(--green-mid)", display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} />
@@ -113,7 +103,7 @@ export default function Home() {
           <style>{`@media(max-width:768px){.features-grid{grid-template-columns:1fr !important;}}`}</style>
         </section>
 
-        {/* STEPS */}
+        {/* STEPS with SVG illustrations */}
         <section className="section">
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: 56 }}>
@@ -129,8 +119,8 @@ export default function Home() {
                   <p style={{ fontSize: 17, color: "var(--text-3)", lineHeight: 1.7, marginBottom: 28 }}>{s.body}</p>
                   <Link href="/how-it-works" className="btn btn-secondary">Learn more →</Link>
                 </div>
-                <div style={{ order: i % 2 === 1 ? 1 : 2, borderRadius: 16, aspectRatio: "4/3", background: i === 0 ? "var(--blue-light)" : i === 1 ? "var(--green-light)" : "var(--amber-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80, opacity: 0.6 }}>
-                  {i === 0 ? "🪪" : i === 1 ? "📜" : "🔐"}
+                <div style={{ order: i % 2 === 1 ? 1 : 2, borderRadius: 16, aspectRatio: "4/3", overflow: "hidden", background: stepBgs[i] }}>
+                  <s.Visual />
                 </div>
               </div>
             ))}
@@ -182,6 +172,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
       </main>
       <Footer />
     </>
