@@ -25,7 +25,7 @@ export default function Navbar() {
       justifyContent: "space-between",
     }}>
       <Link href="/" className="nav-logo">
-        <Logo size={36} />
+        <Logo size={36} variant="primary" />
         <span>BitStats</span>
       </Link>
 

@@ -31,7 +31,7 @@ export default function Footer() {
         }} className="footer-grid-inner">
           <div>
             <Link href="/" className="nav-logo" style={{ marginBottom: 16, display: "inline-flex" }}>
-              <Logo size={36} />
+              <Logo size={36} variant="primary" />
               <span>BitStats</span>
             </Link>
             <p style={{ fontSize: 14, color: "var(--text-3)", lineHeight: 1.7, marginTop: 12 }}>
