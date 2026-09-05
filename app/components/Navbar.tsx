@@ -6,6 +6,7 @@ import Logo from "./Logo";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/verify", label: "Verify" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/credentials", label: "Credentials" },
   { href: "/blog", label: "Blog" },
@@ -39,9 +40,9 @@ export default function Navbar() {
             transition: "all 0.15s",
           }}>{l.label}</Link>
         ))}
-        <a href="#" className="btn btn-primary" style={{ marginLeft: 8, padding: "8px 20px", fontSize: 14 }}>
+        <Link href="/verify" className="btn btn-primary" style={{ marginLeft: 8, padding: "8px 20px", fontSize: 14 }}>
           Launch app →
-        </a>
+        </Link>
       </div>
 
       {/* Mobile hamburger */}
@@ -63,7 +64,7 @@ export default function Navbar() {
               background: path === l.href ? "var(--blue-light)" : "transparent",
             }}>{l.label}</Link>
           ))}
-          <a href="#" className="btn btn-primary" style={{ marginTop: 8 }}>Launch app →</a>
+          <Link href="/verify" className="btn btn-primary" style={{ marginTop: 8 }} onClick={() => setOpen(false)}>Launch app →</Link>
         </div>
       )}
 

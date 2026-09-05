@@ -1,0 +1,21 @@
+[project]
+name = "bitstats"
+description = "BitStats identity layer — credential registry and verifier"
+authors = []
+telemetry = false
+cache_dir = "./.cache"
+
+[contracts.bil-registry]
+path = "contracts/bil-registry.clar"
+clarity_version = 3
+epoch = "3.1"
+
+# Depends on bil-registry, so it must be listed after it.
+[contracts.bil-verifier]
+path = "contracts/bil-verifier.clar"
+clarity_version = 3
+epoch = "3.1"
+
+[repl.analysis]
+passes = ["check_checker"]
+check_checker = { trusted_sender = false, trusted_caller = false, callee_filter = false }

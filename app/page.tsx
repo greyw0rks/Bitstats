@@ -19,16 +19,13 @@ const steps = [
 
 const stepBgs = ["#F0F5FF", "#F0FBF8", "#FFFBF5"];
 
-const stats = [
-  { num: "50K+", label: "Credentials issued" },
-  { num: "2s",   label: "Proof generation" },
-  { num: "100%", label: "Private by default" },
-];
-
-const testimonials = [
-  { quote: "BitStats is the missing identity layer Bitcoin has needed. The BNS integration is elegant.", name: "Alex Chen", role: "DeFi Protocol Lead" },
-  { quote: "We integrated in a weekend. The verifier contract just works — clean boolean, no data leakage.", name: "Priya Nair", role: "Smart Contract Dev" },
-  { quote: "Finally a KYC solution that doesn't compromise privacy. ZK proofs make this the gold standard.", name: "Marcus Webb", role: "Compliance Officer" },
+// Facts about the design, not usage claims. The previous version advertised
+// "50K+ credentials issued" and three named testimonials for a product with no
+// deployed contract; live counts belong on /verify, which reads them from chain.
+const properties = [
+  { num: "32 B", label: "Stored per credential" },
+  { num: "0", label: "Bytes of your data on chain" },
+  { num: "1 call", label: "To verify from any contract" },
 ];
 
 export default function Home() {
@@ -52,11 +49,11 @@ export default function Home() {
                 BNS is your identity root. Credentials live onchain. You prove what matters without exposing what doesn&apos;t.
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 48 }}>
-                <Link href="/credentials" className="btn btn-primary">Get started →</Link>
+                <Link href="/verify" className="btn btn-primary">Verify a name →</Link>
                 <Link href="/how-it-works" className="btn btn-secondary">How it works</Link>
               </div>
               <div style={{ display: "flex", gap: 32 }}>
-                {stats.map(s => (
+                {properties.map(s => (
                   <div key={s.label}>
                     <div style={{ fontSize: 26, fontWeight: 900, fontFamily: "Urbanist, sans-serif", color: "var(--blue)" }}>{s.num}</div>
                     <div style={{ fontSize: 12, color: "var(--text-4)" }}>{s.label}</div>
@@ -128,25 +125,39 @@ export default function Home() {
           <style>{`@media(max-width:768px){.hiw-row{grid-template-columns:1fr !important; gap:32px !important;} .hiw-row > div{order:unset !important;}}`}</style>
         </section>
 
-        {/* TESTIMONIALS */}
+        {/* HOW TO INTEGRATE — replaces the invented testimonials with the
+            actual call a dapp makes. */}
         <section className="section" style={{ background: "var(--bg2)" }}>
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: 48 }}>
-              <p className="section-kicker">Testimonials</p>
-              <h2 className="section-title">Trusted by builders</h2>
+              <p className="section-kicker">Integration</p>
+              <h2 className="section-title">One read-only call</h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }} className="testi-grid">
-              {testimonials.map(t => (
-                <div key={t.name} style={{ background: "white", borderRadius: 16, padding: 28, border: "1px solid var(--border)" }}>
-                  <div style={{ fontSize: 32, color: "var(--blue)", marginBottom: 12, lineHeight: 1 }}>&ldquo;</div>
-                  <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--text-2)", marginBottom: 20 }}>{t.quote}</p>
-                  <div style={{ fontWeight: 700, fontSize: 14 }}>{t.name}</div>
-                  <div style={{ fontSize: 13, color: "var(--text-4)" }}>{t.role}</div>
-                </div>
-              ))}
+            <div style={{ maxWidth: 720, margin: "0 auto" }}>
+              <pre style={{
+                background: "var(--text)", color: "#E8ECF5", borderRadius: 16, padding: 24,
+                overflowX: "auto", fontSize: 13, lineHeight: 1.7,
+                fontFamily: "ui-monospace, monospace", border: "1px solid var(--border-dark)",
+              }}>
+{`;; from any Clarity contract
+(contract-call? .bil-verifier verify "satoshi.btc" "kyc-basic")
+;; => true
+
+;; or abort your own transaction when it fails
+(try! (contract-call? .bil-verifier assert-valid "satoshi.btc" "kyc-basic"))`}
+              </pre>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--text-2)", marginTop: 24 }}>
+                The registry stores a 32-byte commitment and nothing else, so there is no personal
+                data on chain to leak. Expiry is measured against the Bitcoin clock, and
+                deactivating an issuer invalidates every credential it signed — both are covered by
+                the contract test suite.
+              </p>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}>
+                <Link href="/verify" className="btn btn-primary">Try it against a name →</Link>
+                <Link href="/how-it-works" className="btn btn-secondary">Read the design</Link>
+              </div>
             </div>
           </div>
-          <style>{`@media(max-width:768px){.testi-grid{grid-template-columns:1fr 1fr !important;}} @media(max-width:480px){.testi-grid{grid-template-columns:1fr !important;}}`}</style>
         </section>
 
         {/* CTA */}

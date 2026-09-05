@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BitStats — Bitcoin identity layer
 
-## Getting Started
+A BNS name as a permanent identity root, credentials as on-chain commitments, and
+verification as a single boolean. No personal data is ever stored on chain.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+app/         Next.js 16 site + /verify tool
+contracts/   bil-registry · bil-verifier   (Clarity)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What is actually working
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **BNS resolution is live.** `/verify` resolves any registered name against
+  mainnet BNS through Hiro, so the identity-root half works today.
+- **The contracts exist and are tested.** `bil-registry` and `bil-verifier` are in
+  `contracts/`, with 24 tests. The site referenced `bil-verifier.clar` before it
+  had been written; it now exists.
+- **They are not deployed yet.** Until `NEXT_PUBLIC_CONTRACT_ADDRESS` is set,
+  `/verify` resolves the name and says plainly that the credential registry is
+  absent, rather than implying a check happened.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The landing page previously advertised "50K+ credentials issued" and three named
+testimonials for a product with no deployed contract. Both are gone. The hero now
+states properties of the design — 32 bytes stored per credential, zero bytes of
+personal data on chain, one call to verify — and the integration section shows the
+actual contract call.
 
-## Learn More
+## Contracts
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd contracts
+clarinet check
+npm install && npm test   # 24 tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`bil-registry` stores, per `(bns-name, credential-type)`: the issuer, a 32-byte
+hash, an expiry and a revocation flag. Decisions worth knowing:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Only a commitment is stored.** `issue` takes `sha256(credential)`. The document
+  stays with the holder; `matches-hash` lets them prove they hold the preimage.
+- **Expiry is measured against `burn-block-height`**, the Bitcoin clock, so it
+  cannot be nudged by Stacks block cadence. `u0` means never expires.
+- **Deactivating an issuer invalidates everything it signed**, immediately, without
+  touching each credential. Covered by a test.
+- **Re-issuing is restricted to the original issuer**, so a second allow-listed
+  issuer cannot overwrite someone else's attestation.
 
-## Deploy on Vercel
+`bil-verifier` is the integration surface — deliberately tiny, so dapps depend on
+something stable while the registry's storage can change behind it:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```clarity
+(contract-call? .bil-verifier verify "satoshi.btc" "kyc-basic")          ;; => bool
+(contract-call? .bil-verifier verify-both "satoshi.btc" "kyc" "adult")   ;; => bool
+(try! (contract-call? .bil-verifier assert-valid "satoshi.btc" "kyc"))   ;; aborts on failure
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Site
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev     # http://localhost:3000
+```
+
+## Still to do
+
+- Deploy `bil-registry` and `bil-verifier`, then set `NEXT_PUBLIC_CONTRACT_ADDRESS`
+- An issuer console for allow-listing, issuing and revoking — the contracts support it, the UI does not yet
+- The ZK claims on the marketing pages describe an intended design, not shipped code. There is no Groth16 circuit in this repo.
+
+## License
+
+MIT © greyw0rks
